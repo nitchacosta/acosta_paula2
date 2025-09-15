@@ -7,7 +7,7 @@ defined('PREVENT_DIRECT_ACCESS') OR exit('No direct script access allowed');
  * Automatically generated via CLI.
  */
 class crud_Model extends Model {
-    protected $table = 'studentsSs';
+    protected $table = 'studentsss';
     protected $primary_key = 'id';
 
     protected $fillable = [

@@ -8,28 +8,40 @@ defined('PREVENT_DIRECT_ACCESS') OR exit('No direct script access allowed');
  */
 class crud_Model extends Model {
     protected $table = 'studentss';
-    //protected $primary_key = 'id';
+    protected $primary_key = 'id';
 
-    public function __construct()
-    {
-        parent::__construct();
-    }
+    protected $fillable = [
 
-    public function getAll(){
-        return $this->db->table($this->table)->get_all();
+        'student_id',
+        'first_name',
+        'last_name' ,
+        'course'
+    ];
 
-    }
 
-    public function createUser($data){
-        $this->db->table($this->table)->insert($data);
-    }
+    public function page($q, $records_per_page = null, $page = null) {
+            if (is_null($page)) {
+                return $this->db->table($this->table)->get_all();
+            } else {
+                $query = $this->db->table($this->table);
+                
+                // Build LIKE conditions
+                $query->like('id', '%'.$q.'%')
+                    ->or_like('student_id', '%'.$q.'%')
+                    ->or_like('first_name', '%'.$q.'%')
+                    ->or_like('last_name', '%'.$q.'%')
+                    ->or_like('course', '%'.$q.'%');
 
-     public function updateUser($id, $data){
-        return $this->db->table($this->table)->where('id', $id)->update($data);
-    }
-    
-    public function deleteUser($id){
-         return $this->db->table($this->table)->where('id', $id)->delete();
+                // Clone before pagination
+                $countQuery = clone $query;
 
-    }
+                $data['total_rows'] = $countQuery->select_count('*', 'count')
+                                                ->get()['count'];
+
+                $data['records'] = $query->pagination($records_per_page, $page)
+                                        ->get_all();
+
+                return $data;
+            }
+        }
 }
